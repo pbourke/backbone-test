@@ -1,0 +1,147 @@
+<html>
+  <head>
+    <title>Backbone test!</title>
+  </head>
+  <body>
+    <script src="js/jquery-1.7.2.min.js"></script>
+    <script src="js/json2.js"></script>
+    <script src="js/underscore.js"></script>
+    <script src="js/backbone.js"></script>
+    <script src="js/mustache.js"></script>
+    <script src="js/ICanHaz-no-mustache.js"></script>
+
+    <script id="personrow" type="text/html">
+      <li><strong>{{name}}</strong>
+        {{#hometown}}
+          from <em>{{hometown}}</em>
+        {{/hometown}}
+      </li>
+    </script>
+
+    <script id="countpanel" type="text/html">
+      <p>
+        There are {{count}} person rows.
+      </p>
+    </script>
+
+    <script type="text/javascript">
+      $(document).ready(function() {
+        var UpdatingCollectionView = Backbone.View.extend({
+          initialize : function(options) {
+            _(this).bindAll('add', 'remove');
+         
+            if (!options.childViewConstructor) throw "no child view constructor provided";
+            if (!options.childViewTagName) throw "no child view tag name provided";
+         
+            this._childViewConstructor = options.childViewConstructor;
+            this._childViewTagName = options.childViewTagName;
+         
+            this._childViews = [];
+         
+            this.collection.each(this.add);
+         
+            this.collection.bind('add', this.add);
+            this.collection.bind('remove', this.remove);
+          },
+         
+          add : function(model) {
+            var childView = new this._childViewConstructor({
+              tagName : this._childViewTagName,
+              model : model
+            });
+         
+            this._childViews.push(childView);
+         
+            if (this._rendered) {
+              $(this.el).append(childView.render().el);
+            }
+          },
+         
+          remove : function(model) {
+            var viewToRemove = _(this._childViews).select(function(cv) { return cv.model === model; })[0];
+            this._childViews = _(this._childViews).without(viewToRemove);
+         
+            if (this._rendered) $(viewToRemove.el).remove();
+          },
+         
+          render : function() {
+            var that = this;
+            this._rendered = true;
+         
+            $(this.el).empty();
+         
+            _(this._childViews).each(function(childView) {
+              $(that.el).append(childView.render().el);
+            });
+         
+            return this;
+          }
+        });
+
+        var GroupCountView = Backbone.View.extend({
+          initialize: function(options) {
+            this.collection.on('add', this.render, this);
+            this.collection.on('remove', this.render, this);
+          },
+
+          render: function() {
+            var context = {
+              count: this.collection.length
+            };
+            this.el.innerHTML = ich.countpanel(context).html();
+            return this;
+          }
+        });
+
+        var Person = Backbone.Model.extend({});
+
+        var PersonView = Backbone.View.extend({
+          tagName: "li",
+
+          initialize : function(options) {
+            this.render = _.bind(this.render, this);
+         
+            this.model.bind('change', this.render);
+          },
+
+          render: function() {
+            this.el.innerHTML= ich.personrow(this.model.toJSON()).html();
+            return this;
+          }
+        });
+
+        var Group = Backbone.Collection.extend({
+          model: Person
+        });
+
+        window.group = new Group([
+          {name:"Patrick", hometown:"Oakville"},
+          {name:"Foobar", hometown:"Berlin"}
+        ]);
+
+        var groupView = new UpdatingCollectionView({
+          el: $("#group"),
+          collection: group,
+          childViewConstructor: PersonView,
+          childViewTagName: "li"
+        });
+
+        groupView.render();
+
+        var groupCountView = new GroupCountView({
+          el: $("#countpaneltarget"),
+          collection: group
+        });
+
+        groupCountView.render();
+      });
+    
+    </script>
+    
+    <div id="countpaneltarget">
+    </div>
+
+    <ul id="group">
+    </ul>
+  </body>
+</html>
