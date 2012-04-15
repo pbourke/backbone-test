@@ -2,6 +2,10 @@
 <html lang="en">
   <head>
     <title>Backbone test!</title>
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/bootstrap-responsive.css" rel="stylesheet">
+    <style>
+    </style>
   </head>
   <body>
     <script src="js/jquery-1.7.2.min.js"></script>
@@ -12,11 +16,20 @@
     <script src="js/ICanHaz-no-mustache.js"></script>
 
     <script id="personrow" type="text/html">
-      <li><strong>{{name}}</strong>
+      <li class="row"><a href="#">{{name}}</a>
         {{#hometown}}
           from <em>{{hometown}}</em>
         {{/hometown}}
       </li>
+    </script>
+
+    <script id="persondetail" type="text/html">
+      <p class="detail">
+        {{name}}
+        {{#hometown}}
+          from {{hometown}}
+        {{/hometown}}
+      </p>
     </script>
 
     <script id="countpanel" type="text/html">
@@ -96,18 +109,45 @@
 
         var Person = Backbone.Model.extend({});
 
-        var PersonView = Backbone.View.extend({
+        var PersonRowView = Backbone.View.extend({
           tagName: "li",
 
           initialize : function(options) {
-            this.render = _.bind(this.render, this);
-         
-            this.model.bind('change', this.render);
+            this.model.on('change', this.render, this);
           },
 
           render: function() {
-            this.el.innerHTML= ich.personrow(this.model.toJSON()).html();
+            $(this.el).html(ich.personrow(this.model.toJSON()).html());
             return this;
+          },
+
+          events: {
+            "click": "select",
+          },
+
+          select: function() {
+            if ( !_.isUndefined(window.persondetailview) ) {
+              console.log("removing existing view");
+              window.persondetailview.undelegateEvents();
+            }
+            console.log("creating new view");
+            window.persondetailview = new PersonDetailView({
+              model: this.model
+            });
+            console.log("calling render");
+            window.persondetailview.render();
+          }
+        });
+
+        var PersonDetailView = Backbone.View.extend({
+          el: $("#detailtarget"),
+
+          initialize: function(options) {
+            this.model.on('change', this.render, this);
+          },
+
+          render: function() {
+            $(this.el).html(ich.persondetail(this.model.toJSON()).html());
           }
         });
 
@@ -123,7 +163,7 @@
         var groupView = new UpdatingCollectionView({
           el: $("#group"),
           collection: group,
-          childViewConstructor: PersonView,
+          childViewConstructor: PersonRowView,
           childViewTagName: "li"
         });
 
@@ -138,11 +178,22 @@
       });
     
     </script>
-    
-    <div id="countpaneltarget">
-    </div>
 
-    <ul id="group">
-    </ul>
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span3">
+          <div id="countpaneltarget">
+          </div>
+
+          <ul id="group">
+          </ul>
+        </div>
+        <div class="span9">
+          <div id="detailtarget">
+          </div>
+        </div>
+      </div>
+    </div>
+    
   </body>
 </html>
