@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Backbone test!</title>
+    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+    <style>
+    </style>
+  </head>
+  <body>
+    <script src="js/vendor/jquery-1.8.0.min.js"></script>
+    <script src="js/vendor/json2.js"></script>
+    <script src="js/vendor/underscore-min.js"></script>
+    <script src="js/vendor/backbone-min.js"></script>
+    <script src="js/vendor/mustache.js"></script>
+    <script src="js/vendor/ICanHaz-no-mustache.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="js/app.js"></script>
+
+    <script id="nameRow" type="text/html">
+      <li>
+        {{id}}
+      </li>
+    </script>
+
+    <script id="persondetail" type="text/html">
+      <p class="detail">
+        {{name}}
+        {{#hometown}}
+          from {{hometown}}
+        {{/hometown}}
+      </p>
+    </script>
+
+    <script id="countpanel" type="text/html">
+      <p>
+        There are {{count}} person rows.
+      </p>
+    </script>
+
+    <div class="container-fluid">
+        <div class="row-fluid">
+            <div class="span12">
+                <div class="page-header">
+                    <h1>Bootstrap and Backbone Test</h1>
+                </div>
+            </div>
+        </div>
+      <div class="row-fluid">
+        <div class="span6">
+            <form id="addForm" class="form-horizontal">
+                <div class="control-group">
+                    <label class="control-label" for "name">Name</label>
+                    <div class="controls">
+                        <div class="input-prepend">
+                            <span class="add-on"><i class="icon-leaf"></i></span><input type="text" id="name" placeholder="Name" class="tooltipEnabled" title="Enter your name here" data-placement="right">
+                        </div>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <div class="controls">
+                        <button type="submit" class="btn btn-primary">Add</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="span6">
+            <ul id="names">
+            </ul>
+        </div>
+      </div>
+    </div>
+    
+  </body>
+</html>
