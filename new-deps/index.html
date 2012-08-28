@@ -17,24 +17,32 @@
     <script src="js/app.js"></script>
 
     <script id="nameRow" type="text/html">
-      <li>
-        {{id}}
-      </li>
+        {{id}} <a class="removeName" href="#">remove</a>
     </script>
 
-    <script id="persondetail" type="text/html">
-      <p class="detail">
-        {{name}}
-        {{#hometown}}
-          from {{hometown}}
-        {{/hometown}}
-      </p>
-    </script>
-
-    <script id="countpanel" type="text/html">
+    <script id="summaryView" type="text/html">
       <p>
-        There are {{count}} person rows.
+        {{^empty}}
+            There are <strong>{{count}}</strong> names.
+        {{/empty}}
+        {{#empty}}
+            There aren&apos;t any names yet
+        {{/empty}}
       </p>
+    </script>
+
+    <script id="letterSummaryView" type="text/html">
+      <div>
+        <p>First-letter counts</p>
+        <ul>
+        {{#letters}}
+            <li><strong>{{letter}}</strong> - {{count}}</li>
+        {{/letters}}
+        {{^letters}}
+            No letters yet!
+        {{/letters}}
+        </ul>
+      </div>
     </script>
 
     <div class="container-fluid">
@@ -52,7 +60,7 @@
                     <label class="control-label" for "name">Name</label>
                     <div class="controls">
                         <div class="input-prepend">
-                            <span class="add-on"><i class="icon-leaf"></i></span><input type="text" id="name" placeholder="Name" class="tooltipEnabled" title="Enter your name here" data-placement="right">
+                            <span class="add-on"><i class="icon-leaf"></i></span><input type="text" id="name" placeholder="Name" class="tooltipEnabled" title="Enter your name here" data-placement="right" autocomplete="off">
                         </div>
                     </div>
                 </div>
@@ -62,8 +70,12 @@
                     </div>
                 </div>
             </form>
+            <div id="letterSummaryViewContainer">
+            </div>
         </div>
         <div class="span6">
+            <div id="summaryViewContainer">
+            </div>
             <ul id="names">
             </ul>
         </div>
